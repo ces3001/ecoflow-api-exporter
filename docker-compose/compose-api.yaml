@@ -1,0 +1,78 @@
+services:
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--web.enable-admin-api'
+    ports:
+      - 9090:9090
+    restart: unless-stopped
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prom_data:/prometheus
+
+  # alertmanager:
+  #   image: prom/alertmanager
+  #   container_name: alertmanager
+  #   command:
+  #     - '--config.file=/etc/alertmanager/alertmanager.yml'
+  #   ports:
+  #     - 9093:9093
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./alertmanager:/etc/alertmanager
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USERNAME}
+      GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_PASSWORD}"
+      GF_RENDERING_SERVER_URL: http://renderer:8081/render
+      GF_RENDERING_CALLBACK_URL: http://grafana:3000/
+      GF_LOG_FILTERS: rendering:debug
+    volumes:
+      - ./grafana:/etc/grafana/provisioning/datasources
+      - ./grafana/plugins:/var/lib/grafana/plugins
+      - grafana_data:/var/lib/grafana
+
+  ecoflow_exporter:
+    image: ecoflow_exporter_api:latest
+    container_name: ecoflow_exporter
+    ports:
+      - 9091:9090
+    restart: unless-stopped
+    environment:
+      DEVICE_SN: ${DEVICE_SN}
+      ECOFLOW_ACCESS_KEY: ${ECOFLOW_ACCESS_KEY}
+      ECOFLOW_SECRET_KEY: ${ECOFLOW_SECRET_KEY}
+      ECOFLOW_API_HOST: ${ECOFLOW_API_HOST:-api.ecoflow.com}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      EXPORTER_PORT: 9090
+
+  nws_exporter:
+    build:
+      context: /Users/ces/Documents/Dev/nws_exporter
+      dockerfile: Dockerfile
+    container_name: nws_exporter
+    command: ["-station", "PHOG", "-backofftime", "1800", "-verbose"]
+    ports:
+      - 8080:8080
+    restart: unless-stopped
+
+  renderer:
+    image: grafana/grafana-image-renderer:latest
+    container_name: grafana-renderer
+    ports:
+      - 8081:8081
+    restart: unless-stopped
+    environment:
+      ENABLE_METRICS: 'true'
+
+volumes:
+  prom_data:
+  grafana_data:
