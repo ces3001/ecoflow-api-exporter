@@ -12,10 +12,10 @@ scrape_configs:
   - job_name: ecoflow
     static_configs:
       - targets:
-          - ecoflowexporter:9090
+          - ecoflow_exporter:9090
 
   - job_name: nws_exporter
     static_configs:
       - targets:
-          - nwsexporter:8080
+          - nws_exporter:8080
     scrape_interval: 60s
