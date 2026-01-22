@@ -1,10 +1,11 @@
 # EcoFlow Prometheus and Grafana dashboard
 Based on https://github.com/berezhinskiy/ecoflow_exporter
-But using EcoFlow Developer API instead of username/password, as it seems to be more reliable. (No need to  have app open on the phone).
-Also some files on here to deploy on Railway.com 
-And a National Weather Service exporter too.
+- But using EcoFlow Developer API instead of username/password, as it seems to be more reliable. (No need to  have app open on the phone)
+  - Use ecoflow_exporter_api.py instead of ecoflow_exporter.py
+- Also some files on here to deploy on Railway.com for 24/7 server that you don't need to run all this locally.
+- And a National Weather Service exporter too.
 
-Blow is the original exporter README:
+Below is the original exporter README:
 
 # ⚡ EcoFlow to Prometheus exporter
 
