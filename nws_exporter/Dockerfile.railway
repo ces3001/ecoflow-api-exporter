@@ -1,0 +1,19 @@
+FROM golang:1.21-alpine AS builder
+
+WORKDIR /build
+
+COPY . .
+
+RUN go build -o nws_exporter
+
+FROM alpine:latest
+
+WORKDIR /app
+
+COPY --from=builder /build/nws_exporter /app/nws_exporter
+
+EXPOSE 8080
+
+# Default to PHOG station with 1800s backoff and verbose mode
+# Can be overridden via Railway service settings
+CMD ["/app/nws_exporter", "-station", "PHOG", "-backofftime", "1800", "-verbose"]
